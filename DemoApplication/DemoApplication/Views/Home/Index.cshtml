@@ -1,0 +1,273 @@
+﻿<div>
+    <div class="m-3 pt-3 pb-3">
+        <button type="button" class="btn btn-primary" ng-click="GenerateObjCreate()" data-toggle="modal" data-target="#createModal"><i class="fa fa-user-plus"></i> New Customer</button>
+    </div>
+    <div>
+        <table st-table="displayCustomers" st-safe-src="customers" class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th st-sort="FirstName">First Name</th>
+                    <th st-sort="LastName">Last Name</th>
+                    <th st-sort="Gender">Gender</th>
+                    <th st-sort="DOB">DOB</th>
+                    <th st-sort="Address">Address</th>
+                    <th st-sort="Money">Money</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th><input st-search="FirstName" class="form-control" placeholder="First Name Search" type="search" /></th>
+                    <th><input st-search="LastName" class="form-control" placeholder="Last Name Search" type="search" /></th>
+                    <th><input st-search="Gender" class="form-control" placeholder=" Gender Search" type="search" /></th>
+                    <th><input st-search="DOB" class="form-control" placeholder="DOB Search" type="search" /></th>
+                    <th><input st-search="Address" class="form-control" placeholder="Address Search" type="search" /></th>
+                    <th><input st-search="Money" class="form-control" placeholder="Money Search" type="search" /></th>
+                    <th><input st-search="" class="form-control" placeholder="Global Search" type="search" /></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="c in displayCustomers">
+                    <td>{{c.FirstName}}</td>
+                    <td>{{c.LastName}}</td>
+                    <td>{{c.Gender}}</td>
+                    <td>{{c.DOB}}</td>
+                    <td>{{c.Address}}</td>
+                    <td>{{c.Money}}</td>
+                    <td>
+                        <button type="button" class="btn btn-info" ng-click="ShowDetail(c)" data-toggle="modal" data-target="#detailModal" title="Detail"><i class="fa fa-search-plus"></i></button>
+                        <button type="button" class="btn btn-warning" ng-click="RetrieveCustomer(c)" data-toggle="modal" data-target="#editModal" title="Edit"><i class="fa fa-edit"></i></button>
+                        <button type="button" class="btn btn-danger" ng-click="ShowDetail(c)" data-toggle="modal" data-target="#deleteModal" title="Delete"><i class="fa fa-trash"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!--Detail Modal-->
+<div class="modal" id="detailModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">{{currentCustomer.FirstName}} {{currentCustomer.LastName}}'s Detail</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <p>First Name: {{currentCustomer.FirstName}}</p>
+                <p>Last Name: {{currentCustomer.LastName}}</p>
+                <p>Gender: {{currentCustomer.Gender}}</p>
+                <p>DOB: {{currentCustomer.DOB}}</p>
+                <p>Address: {{currentCustomer.Address}}</p>
+                <p>Money: {{currentCustomer.Money}}</p>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!--Create Modal-->
+<div class="modal" id="createModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Add New Customer</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form name="createForm" id="createForm" ng-submit="CreateCustomer(createForm.$valid, createForm.dob.$valid)" novalidate>
+                    <div class="form-group">
+                        <label for="fname">First Name:</label>
+                        <input id="fname" type="text" class="form-control" ng-model="objCreate.FirstName" name="fname" ng-required="true" ng-maxlength="20" ng-pattern="alphabeticPtn" />
+                        <span class="text-danger" ng-show="(createForm.$submitted || createForm.fname.$dirty) && createForm.fname.$invalid">
+                            <span ng-show="createForm.fname.$error.required">First Name is required.</span>
+                            <span ng-show="createForm.fname.$error.maxlength">First Name must be no longer than 20 characters.</span>
+                            <span ng-show="createForm.fname.$error.pattern">First Name must only contain alphabetic characters.</span>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label for="lname">Last Name:</label>
+                        <input id="lname" type="text" class="form-control" ng-model="objCreate.LastName" name="lname" ng-required="true" ng-maxlength="20" ng-pattern="alphabeticPtn" />
+                        <span class="text-danger" ng-show="(createForm.$submitted || createForm.lname.$dirty) && createForm.lname.$invalid">
+                            <span ng-show="createForm.lname.$error.required">Last Name is required.</span>
+                            <span ng-show="createForm.lname.$error.maxlength">Last Name must be no longer than 20 characters.</span>
+                            <span ng-show="createForm.lname.$error.pattern">Last Name must only contain alphabetic characters.</span>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender:</label>
+                        <label id="gender" ng-repeat="g in genders">
+                            <input class="ml-2 mr-1" type="radio" name="gender" ng-model="objCreate.Gender" ng-value="g" />{{g}}
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="dob">DOB:</label>
+                        <input id="dob" type="text" class="form-control" ng-model="objCreate.DOB" ng-change="CheckInvalidDate(objCreate.DOB, today)" name="dob" placeholder="DD/MM/YYYY" ng-required="true" ng-pattern="datePtn" />
+                        <span class="text-danger" ng-show="(createForm.$submitted || createForm.dob.$dirty) && (createForm.dob.$invalid || invalidDate)">
+                            <span ng-show="createForm.dob.$error.required">DOB is required.</span>
+                            <span ng-show="createForm.dob.$error.pattern">DOB must follow the format of 'DD/MM/YYYY'.</span>
+                            <span ng-show="invalidDate">DOB must be today or before.</span>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address:</label>
+                        <input id="address" type="text" class="form-control" ng-model="objCreate.Address" name="address" ng-required="true" ng-maxlength="50" ng-pattern="alphanumericPtn" />
+                        <span class="text-danger" ng-show="(createForm.$submitted || createForm.address.$dirty) && createForm.address.$invalid">
+                            <span ng-show="createForm.address.$error.required">Address is required.</span>
+                            <span ng-show="createForm.address.$error.maxlength">Address must be no longer than 50 characters.</span>
+                            <span ng-show="createForm.address.$error.pattern">Address must only contain alphanumeric characters.</span>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label for="money">Money:</label>
+                        <input id="money" type="text" class="form-control" ng-model="objCreate.Money" name="money" ng-required="true" ng-maxlength="10" ng-pattern="numericPtn" />
+                        <span class="text-danger" ng-show="(createForm.$submitted || createForm.money.$dirty) && createForm.money.$invalid">
+                            <span ng-show="createForm.money.$error.required">Money is required.</span>
+                            <span ng-show="createForm.money.$error.maxlength">Money must be no longer than 10 digits.</span>
+                            <span ng-show="createForm.money.$error.pattern">Money must be a number.</span>
+                        </span>
+                    </div>
+                </form>
+                <div class="text-danger" ng-show="hasServerErrors">
+                    <span>Server validation:</span>
+                    <ul ng-repeat="e in errors">
+                        <li>{{e}}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" form="createForm">Create</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!--Edit Modal-->
+<div class="modal" id="editModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Edit</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form name="updateForm" id="updateForm" ng-submit="UpdateCustomer(updateForm.$valid, updateForm.dob.$valid)" novalidate>
+                    <div class="form-group">
+                        <label for="fname">First Name:</label>
+                        <input id="fname" type="text" class="form-control" ng-model="objUpdate.FirstName" name="fname" ng-required="true" ng-maxlength="20" ng-pattern="alphabeticPtn" />
+                        <span class="text-danger" ng-show="(updateForm.$submitted || updateForm.fname.$dirty) && updateForm.fname.$invalid">
+                            <span ng-show="updateForm.fname.$error.required">First Name is required.</span>
+                            <span ng-show="updateForm.fname.$error.maxlength">First Name must be no longer than 20 characters.</span>
+                            <span ng-show="updateForm.fname.$error.pattern">First Name must only contain alphabetic characters.</span>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label for="lname">Last Name:</label>
+                        <input id="lname" type="text" class="form-control" ng-model="objUpdate.LastName" name="lname" ng-required="true" ng-maxlength="20" ng-pattern="alphabeticPtn" />
+                        <span class="text-danger" ng-show="(updateForm.$submitted || updateForm.lname.$dirty) && updateForm.lname.$invalid">
+                            <span ng-show="updateForm.lname.$error.required">Last Name is required.</span>
+                            <span ng-show="updateForm.lname.$error.maxlength">Last Name must be no longer than 20 characters.</span>
+                            <span ng-show="updateForm.lname.$error.pattern">Last Name must only contain alphabetic characters.</span>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender:</label>
+                        <label id="gender" ng-repeat="g in genders">
+                            <input class="ml-2 mr-1" type="radio" name="gender" ng-model="objUpdate.Gender" ng-value="g" />{{g}}
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="dob">DOB:</label>
+                        <input id="dob" type="text" class="form-control" ng-model="objUpdate.DOB" name="dob" ng-change="CheckInvalidDate(objUpdate.DOB, today)" placeholder="DD/MM/YYYY" ng-required="true" ng-pattern="datePtn" />
+                        <span class="text-danger" ng-show="(updateForm.$submitted || updateForm.dob.$dirty) && (updateForm.dob.$invalid || invalidDate)">
+                            <span ng-show="updateForm.dob.$error.required">DOB is required.</span>
+                            <span ng-show="updateForm.dob.$error.pattern">DOB must follow the format of 'DD/MM/YYYY'.</span>
+                            <span ng-show="invalidDate">DOB must be today or before.</span>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address:</label>
+                        <input id="address" type="text" class="form-control" ng-model="objUpdate.Address" name="address" ng-required="true" ng-maxlength="50" ng-pattern="alphanumericPtn" />
+                        <span class="text-danger" ng-show="(updateForm.$submitted || updateForm.address.$dirty) && updateForm.address.$invalid">
+                            <span ng-show="updateForm.address.$error.required">Address is required.</span>
+                            <span ng-show="updateForm.address.$error.maxlength">Address must be no longer than 50 characters.</span>
+                            <span ng-show="updateForm.address.$error.pattern">Address must only contain alphanumeric characters.</span>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label for="money">Money:</label>
+                        <input id="money" type="text" class="form-control" ng-model="objUpdate.Money" name="money" ng-required="true" ng-maxlength="10" ng-pattern="numericPtn" />
+                        <span class="text-danger" ng-show="(updateForm.$submitted || updateForm.money.$dirty) && updateForm.money.$invalid">
+                            <span ng-show="updateForm.money.$error.required">Money is required.</span>
+                            <span ng-show="updateForm.money.$error.maxlength">Money must be no longer than 10 digits.</span>
+                            <span ng-show="updateForm.money.$error.pattern">Money must be a number.</span>
+                        </span>
+                    </div>
+                </form>
+                <div class="text-danger" ng-show="hasServerErrors">
+                    <span>Server validation:</span>
+                    <ul ng-repeat="e in errors">
+                        <li>{{e}}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" form="updateForm">Update</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!--Delete Modal-->
+<div class="modal" id="deleteModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Do you want to delete {{currentCustomer.FirstName}} {{currentCustomer.LastName}}?</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <p>First Name: {{currentCustomer.FirstName}}</p>
+                <p>Last Name: {{currentCustomer.LastName}}</p>
+                <p>Gender: {{currentCustomer.Gender}}</p>
+                <p>DOB: {{currentCustomer.DOB}}</p>
+                <p>Address: {{currentCustomer.Address}}</p>
+                <p>Money: {{currentCustomer.Money}}</p>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" ng-click="DeleteCustomer(currentCustomer.Id)" data-dismiss="modal">Delete</button>
+                <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
