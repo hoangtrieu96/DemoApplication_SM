@@ -34,9 +34,7 @@ namespace DemoApplication.Models
         public string Gender { get; set; }
 
         [Required(ErrorMessage = "Invalid: {0} is required.")]
-        //[DateValidation(ErrorMessage = "Invalid: {0} invalid format.")]
-        // Cannot validate the date format with either Regex or custom ValidationAttribute
-        // Tested with console app and the custom class works fine
+        [DateValidation(ErrorMessage = "Invalid: {0} invalid format.")]
         public DateTime DOB { get; set; }
 
         [Required(ErrorMessage = "Invalid: {0} is required.")]

@@ -45,9 +45,9 @@ DemoApplication.controller('CustomerController', function ($scope, CustomerServi
 
     //--- Get all ---
     $scope.GetAll = function () {
-        var queryOp = CustomerService.query();
         // Format DOB before outputting it to html page
-        queryOp.$promise.then(function (data) {
+        CustomerService.query()
+        .$promise.then(function (data) {
             $scope.customers = ArrayFormatDate(data);
         });
     }
@@ -130,7 +130,6 @@ DemoApplication.controller('CustomerController', function ($scope, CustomerServi
                 $('#editModal').modal('hide');
                 $scope.GetAll();
             }, function (error) {
-                console.log(error);
                 $scope.errors = FlattenObject(error.data.ModelState);
                 $scope.hasServerErrors = true;
             });
