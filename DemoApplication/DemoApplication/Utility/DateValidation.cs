@@ -9,7 +9,8 @@ namespace DemoApplication.Utility
         {
             // Check if the date is today or before.
             DateTime date = Convert.ToDateTime(value);
-            return (date > (new DateTime()));
+            DateTime today = DateTime.Now;
+            return (date <= today);
         }
     }
 }
